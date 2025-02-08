@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #D70F64;  /* Foodpanda 粉紅色 */
+            --secondary-color: #333333;
+            --background-color: #FFFFFF;
+            --light-gray: #F8F8F8;
+            --text-color: #484848;
+            --border-radius: 8px;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --toggle-bg: #E8E8E8;
+            --toggle-active: var(--primary-color);
+        }
+
+        body {
+            background-color: var(--light-gray);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            font-family: -apple-system, "Noto Sans", sans-serif;
+            color: var(--text-color);
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            position: relative;
+            color: var(--secondary-color);
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        .upload-area {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .file-label:hover {
+            background-color: #1976D2;
+        }
+
+        .quality-control {
+            margin-top: 30px;
+            text-align: left;
+            padding: 24px;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .quality-slider {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #E8E8E8;
+            outline: none;
+            margin: 24px 0;
+        }
+
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .quality-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .options-group {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #E8E8E8;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 0 10px;
+        }
+
+        .file-info {
+            margin: 10px 0;
+            color: #666;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .compress-button, .download-button {
+            padding: 15px 30px;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            min-width: 160px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compress-button {
+            background-color: var(--primary-color);
+        }
+
+        .compress-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .download-button {
+            background-color: var(--secondary-color);
+        }
+
+        .download-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .compress-button:disabled, .download-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .compression-modes {
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .mode-item {
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            transition: all 0.3s;
+            border: 1px solid #E8E8E8;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .mode-item input[type="radio"] {
+            margin-top: 3px;
+        }
+
+        .mode-item-content {
+            flex: 1;
+        }
+
+        .mode-item-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .mode-item-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .mode-item:hover {
+            border-color: var(--primary-color);
+            background-color: #FFF5F9;
+        }
+        
+        .mode-item.selected {
+            border-color: var(--primary-color);
+            background-color: #FFF5F9;
+        }
+        
+        .mode-item label {
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .option-item label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #drop-zone {
+            border: 2px dashed #dcdfe6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            background-color: #fafafa;
+        }
+
+        #drop-zone:hover {
+            border-color: var(--primary-color);
+            background-color: #fff7f5;
+        }
+
+        #drop-zone.drag-over {
+            border-color: var(--primary-color);
+            background-color: #fff7f5;
+        }
+
+        .upload-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #909399;
+        }
+
+        .upload-text {
+            margin-top: 16px;
+            color: #606266;
+        }
+
+        .upload-text em {
+            color: var(--primary-color);
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .link-input-area {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .slides-link-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .slides-link-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .fetch-button {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .fetch-button:hover {
+            transform: translateY(-1px);
+            background-color: #E64A19;
+        }
+
+        .downloaded-file-info {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            display: none;  /* 預設隱藏 */
+        }
+
+        .caterpillar-container {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            pointer-events: none;
+            z-index: 1000;
+            display: block; /* 改為預設顯示 */
+        }
+        
+        .caterpillar {
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: left 0.3s ease;
+            width: 150px !important; /* 固定寵物大小 */
+            height: 150px !important;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            image-rendering: pixelated;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: -60px; /* 調整對話框位置，避免重疊 */
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            opacity: 0;
+            transform: translateX(-50%) translateY(10px);
+            z-index: 1001; /* 確保對話框在寵物上方 */
+        }
+        
+        .speech-bubble.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #fff transparent transparent;
+        }
+
+        .progress-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #FFF5F9;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            color: var(--text-color);
+            animation: fadeIn 0.3s ease-in-out;
+            display: none;
+            opacity: 0;
+        }
+
+        .progress-info.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: left;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* 開關按鈕樣式 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--toggle-bg);
+            transition: .3s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--toggle-active);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex-direction: row-reverse;
+        }
+
+        .file-preview {
+            display: none;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #E8E8E8;
+            border-radius: 8px;
+            text-align: left;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .file-preview-name {
+            color: var(--secondary-color);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .file-preview-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .option-group {
+            border-bottom: 1px solid #E8E8E8;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .option-group:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        /* 修正滑塊在 Firefox 的樣式 */
+        .quality-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .upload-icon svg {
+            transition: all 0.3s;
+        }
+
+        #drop-zone:hover .upload-icon svg {
+            transform: scale(1.1);
+            color: var(--primary-color);
+        }
+
+        /* 檔案資訊區域樣式 */
+        .file-info-preview {
+            display: none;
+            background: #fff;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .file-info-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-info-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .reupload-button {
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .reupload-button:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .upload-content {
+            transition: all 0.3s ease;
+        }
+
+        #drop-zone.has-file {
+            display: none;
+        }
+
+        /* 頁面選擇區域的樣式 */
+        .page-selection {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-selection input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .page-selection input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .page-selection-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 頁面預覽區域樣式 */
+        .page-previews {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .page-previews.show {
+            display: grid;
+        }
+
+        .page-preview-item {
+            position: relative;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            transition: all 0.2s;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .page-preview-item.selected {
+            border-color: var(--primary-color);
+        }
+
+        .page-preview-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .page-preview-image {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 3px;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        /* 預覽載入進度提示樣式 */
+        .preview-loading {
+            padding: 20px;
+            text-align: center;
+            color: var(--secondary-color);
+            background: #fafafa;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .preview-progress {
+            width: 100%;
+            height: 4px;
+            background: #e8e8e8;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .preview-progress-bar {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        /* 修改頁面選擇區域的顯示邏輯 */
+        .page-selection-area {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .page-selection-area.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="link-input-area">
+            <input 
+                type="text" 
+                id="slides-link" 
+                placeholder="請輸入 Google Slides 連結並轉換為 PDF"
+                style="width: 100%;"
+            >
+            <button id="fetch-slides" class="fetch-button">
+                轉換為 PDF
+            </button>
+        </div>
+        
+        <div id="downloaded-file-info" style="display: none;">
+            <p id="file-path-info"></p>
+        </div>
+
+        <div id="drop-zone">
+            <input type="file" accept=".pdf" id="file-input" class="file-input" />
+            <div class="upload-content">
+                <label for="file-input" style="cursor: pointer; display: block;">
+                    <div class="upload-icon">
+                        <svg viewBox="64 64 896 896" width="48" height="48" fill="currentColor">
+                            <path d="M544 864V672h128L512 480 352 672h128v192H320v-1.6c-5.376.32-10.496 1.6-16 1.6A240 240 0 0 1 64 624c0-123.136 93.12-223.488 212.608-237.248A239.808 239.808 0 0 1 512 192a239.872 239.872 0 0 1 235.392 194.752C866.88 400.512 960 500.864 960 624a240 240 0 0 1-240 240c-5.504 0-10.624-1.28-16-1.6v1.6H544z"/>
+                        </svg>
+                    </div>
+                    <div class="upload-text">將檔案拖曳至此處，或<em>點擊上傳</em></div>
+                </label>
+            </div>
+        </div>
+        <div id="file-info-preview" class="file-info-preview" style="display: none; flex-direction: row; justify-content: space-between; align-items: center;">
+            <div>
+                <div id="selected-file-name" class="file-name" style="font-weight: bold; color: var(--primary-color); font-size: 18px; margin-bottom: 5px;"></div>
+                <div class="file-size" style="color: #666; font-size: 14px;"></div>
+            </div>
+            <button id="reset-button" class="reupload-button" style="background: none; border: none; cursor: pointer; padding: 0; display: none;">
+                <i class="fas fa-redo" style="color: var(--primary-color); font-size: 24px;"></i>
+            </button>
+        </div>
+
+        <div class="quality-control">
+            <div class="section-title">進階設定</div>
+            
+            <!-- 選擇特定頁面 -->
+            <div class="page-selection-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <label class="toggle-label" style="margin: 0;">選擇特定頁面</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="page-selection-toggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="page-selection-area">
+                <div class="page-selection">
+                    <input 
+                        type="text" 
+                        id="page-selection-input" 
+                        placeholder="例如：1-3,5,7-9" 
+                        disabled
+                    >
+                </div>
+                <div id="page-previews" class="page-previews"></div>
+                <div class="page-selection-hint">
+                    可單頁(1)、範圍(1-3)、多個頁面(1,3,5)
+                </div>
+            </div>
+
+            <!-- 分隔線 -->
+            <hr style="margin: 20px 0; border: 1px solid #E8E8E8;">
+
+            <!-- 壓縮模式 -->
+            <div class="option-group">
+                <div class="section-subtitle">壓縮模式 (只用於PDF)</div>
+                <div class="compression-modes">
+                    <div class="mode-item">
+                        <input type="radio" name="compression-mode" value="high" checked>
+                        <div class="mode-item-content">
+                            <div class="mode-item-title">高品質</div>
+                            <div class="mode-item-description">適合需要保持清晰度的文件</div>
+                        </div>
+                    </div>
+                    <div class="mode-item">
+                        <input type="radio" name="compression-mode" value="medium">
+                        <div class="mode-item-content">
+                            <div class="mode-item-title">細檔案</div>
+                            <div class="mode-item-description">極細檔案大小</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="option-group">
+                <div class="section-subtitle">圖片設定</div>
+                <div class="option-item">
+                    <label for="image-quality">圖片品質: <span id="image-quality-value">60%</span></label>
+                    <input 
+                        type="range" 
+                        id="image-quality" 
+                        class="quality-slider"
+                        min="50" 
+                        max="100" 
+                        value="60"
+                        step="5"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div id="file-info" class="file-info"></div>
+        <div id="progress-info" class="progress-info"></div>
+
+        <div class="button-group">
+            <button 
+                id="compress-button"
+                class="compress-button"
+                disabled
+            >
+                開始壓縮
+            </button>
+            <button 
+                id="download-button"
+                class="download-button"
+                disabled
+            >
+                下載 PDF
+            </button>
+            <button 
+                id="download-jpg-button"
+                class="download-button"
+                disabled
+            >
+                下載 JPG
+            </button>
+        </div>
+
+        <div class="caterpillar-container" id="caterpillar-container">
+            <div class="caterpillar" id="caterpillar">
+                <div class="speech-bubble" id="speech-bubble">搞掂!! Download啦~</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入必要的函式庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js/dist/fireworks.min.js"></script>
+
+    <script>
+        // 手動定義可用的寵物圖片路徑
+        const predefinedPets = [
+            'pet/1.gif',
+            'pet/2.gif',
+            'pet/3.gif',
+            'pet/4.gif',
+            'pet/5.gif',
+            'pet/6.gif',
+            'pet/7.gif',
+        ];
+
+        const pets = predefinedPets; // 確保 pets 變數被定義
+
+        // 新增函數以獲取可用的寵物圖片
+        async function fetchPetImages() {
+            // 如果伺服器不支持列出目錄，則使用預定義的圖片
+            return predefinedPets; // 返回預定義的圖片路徑
+        }
+
+        // 在頁面載入時設置初始寵物
+        window.addEventListener('load', async function() {
+            const caterpillar = document.querySelector('.caterpillar');
+            const availablePets = await fetchPetImages(); // 獲取可用的寵物圖片
+            if (availablePets.length === 0) {
+                console.error('沒有可用的寵物圖片');
+                return; // 如果沒有可用圖片，則不執行後續代碼
+            }
+            currentPet = getRandomPet(availablePets); // 隨機選擇一個寵物
+            console.log('選擇的寵物圖片:', currentPet); // 調試信息
+            caterpillar.style.backgroundImage = `url('${currentPet}')`;
+            
+            showSpeechBubble(DIALOGS.initial);
+        });
+
+        // 修改隨機選擇寵物的函數
+        function getRandomPet(petList) {
+            let newPet;
+            do {
+                const randomIndex = Math.floor(Math.random() * petList.length);
+                newPet = petList[randomIndex];
+            } while (newPet === currentPet && petList.length > 1);
+            
+            return newPet;
+        }
+
+        // 初始化 PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let selectedFile = null;
+        let processedFile = null;
+        let isProcessing = false;
+        let currentPdfDoc = null; // 添加全局變數來存儲當前的 PDF 文檔
+
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const compressButton = document.getElementById('compress-button');
+        const downloadButton = document.getElementById('download-button');
+        const progressInfo = document.getElementById('progress-info');
+        const imageQualitySlider = document.getElementById('image-quality');
+        const imageQualityValue = document.getElementById('image-quality-value');
+
+        const caterpillarContainer = document.getElementById('caterpillar-container');
+        const caterpillar = document.getElementById('caterpillar');
+
+        // 添加頁面選擇相關變數
+        const pageSelectionToggle = document.getElementById('page-selection-toggle');
+        const pageSelectionInput = document.getElementById('page-selection-input');
+
+        // 添加頁面預覽相關變數
+        const pagePreviews = document.getElementById('page-previews');
+        let selectedPages = new Set();
+
+        let lastSelectedPage = null; // 用於 Shift 多選
+
+        // 修改對話內容
+        const DIALOGS = {
+            initial: "先選1份PDF",
+            beforeCompress: "按「開始壓縮」",
+            complete: "搞掂!!<br>Download啦",
+            clickResponses: ["唔好搞我", "JM9", "DLLM"]
+        };
+
+        // 修改對話顯示時間
+        const DIALOG_DURATIONS = {
+            normal: 3000,
+            complete: 3000
+        };
+
+        let isShowingCompressComplete = false; // 追蹤是否正在顯示壓縮完成對話
+
+        let dialogInterval = null; // 用於循環顯示對話
+
+        let currentDialog = ''; // 添加回當前對話追蹤
+        let isMoving = false; // 添加回移動狀態追蹤
+        let lastProgress = 0; // 添加回進度追蹤
+
+        let currentPet = null; // 追蹤當前寵物
+        let isFirstUpload = true; // 追蹤是否為首次上傳
+
+        // 確保圖片預加載
+        window.addEventListener('DOMContentLoaded', function() {
+            pets.forEach(petUrl => {
+                const img = new Image();
+                img.src = petUrl;
+            });
+        });
+
+        // 修改顯示對話泡泡函數
+        function showSpeechBubble(text, duration = DIALOG_DURATIONS.normal) {
+            const speechBubble = document.getElementById('speech-bubble');
+            
+            // 如果正在顯示完成對話，則不顯示其他對話
+            if (isShowingCompressComplete && !text.includes('Download')) {
+                return;
+            }
+            
+            speechBubble.innerHTML = text;  // 使用 innerHTML 支援 <br>
+            speechBubble.style.display = 'block';
+            
+            requestAnimationFrame(() => {
+                speechBubble.classList.add('show');
+            });
+            
+            if (text === DIALOGS.complete) {
+                isShowingCompressComplete = true;
+                duration = DIALOG_DURATIONS.complete;
+            }
+
+            setTimeout(() => {
+                speechBubble.classList.remove('show');
+                setTimeout(() => {
+                    speechBubble.style.display = 'none';
+                    isShowingCompressComplete = false;
+                }, 150);
+            }, duration);
+        }
+
+        // 修改檔案上傳處理
+        fileInput.addEventListener('change', async function(event) {
+            // 防止重複觸發
+            if (isProcessing) return;
+
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.includes('pdf')) {
+                alert('請選擇 PDF 檔案');
+                this.value = '';
+                return;
+            }
+
+            selectedFile = file;
+            processedFile = null;
+            compressButton.disabled = false;
+            downloadButton.disabled = true;
+            isProcessing = false;
+            isShowingCompressComplete = false;
+
+            // 重置寵物位置和顯示
+            const caterpillar = document.querySelector('.caterpillar');
+            caterpillar.style.transition = 'none';
+            caterpillar.style.left = '20px';
+            
+            // 重新啟用過渡效果
+            setTimeout(() => {
+                caterpillar.style.transition = 'left 0.3s ease';
+            }, 0);
+            
+            // 更新檔案資訊顯示
+            const fileInfoPreview = document.querySelector('.file-info-preview');
+            const fileName = fileInfoPreview.querySelector('.file-name');
+            const fileSize = fileInfoPreview.querySelector('.file-size');
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = `檔案大小：${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            
+            fileInfoPreview.style.display = 'flex';
+            document.getElementById('reset-button').style.display = 'block';
+
+            // 隱藏進度資訊
+            progressInfo.style.display = 'none';
+
+            // 清除之前的對話循環
+            if (dialogInterval) {
+                clearInterval(dialogInterval);
+            }
+
+            showSpeechBubble(DIALOGS.beforeCompress);
+
+            // 在檔案上傳後啟用下載 JPG 按鈕
+            document.getElementById('download-jpg-button').disabled = false; // 啟用下載 JPG 按鈕
+        });
+
+        // 新增重置按鈕的事件處理
+        document.getElementById('reset-button').addEventListener('click', function() {
+            fileInput.value = ''; // 清空檔案輸入
+            document.getElementById('file-info-preview').style.display = 'none'; // 隱藏檔案資訊區域
+            document.getElementById('downloaded-file-info').style.display = 'none'; // 隱藏下載檔案資訊
+            document.getElementById('progress-info').style.display = 'none'; // 隱藏進度資訊
+            this.style.display = 'none'; // 隱藏重置按鈕
+            compressButton.disabled = true; // 禁用壓縮按鈕
+            downloadButton.disabled = true; // 禁用下載按鈕
+            document.getElementById('download-jpg-button').disabled = true; // 禁用下載 JPG 按鈕
+            pageSelectionInput.value = ''; // 清空頁面選擇輸入
+            pagePreviews.classList.remove('show'); // 隱藏頁面預覽
+            selectedPages.clear(); // 清空選擇的頁面
+            
+            // 重置原始大小、壓縮後大小和壓縮率顯示
+            const fileInfo = document.getElementById('file-info');
+            fileInfo.innerHTML = ''; // 清空顯示內容
+        });
+
+        // 修改頁面選擇切換處理
+        pageSelectionToggle.addEventListener('change', async function() {
+            const pageSelectionArea = document.querySelector('.page-selection-area');
+            pageSelectionInput.disabled = !this.checked;
+            
+            if (this.checked) {
+                // 顯示頁面選擇相關對話
+                showSpeechBubble(DIALOGS.clickResponses[
+                    Math.floor(Math.random() * DIALOGS.clickResponses.length)
+                ]);
+                pageSelectionArea.classList.add('show');
+                if (selectedFile) {
+                    try {
+                        const arrayBuffer = await selectedFile.arrayBuffer();
+                        currentPdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                        await generatePreviews(currentPdfDoc);
+                        pagePreviews.classList.add('show');
+                    } catch (error) {
+                        console.error('生成預覽失敗:', error);
+                        alert('生成預覽失敗');
+                    }
+                }
+            } else {
+                pageSelectionArea.classList.remove('show');
+                pagePreviews.classList.remove('show');
+                selectedPages.clear();
+                pageSelectionInput.value = '';
+                // 恢復上傳後的對話循環
+                if (selectedFile) {
+                    showSpeechBubble(DIALOGS.clickResponses[
+                        Math.floor(Math.random() * DIALOGS.clickResponses.length)
+                    ]);
+                }
+            }
+        });
+
+        // 修改頁面選擇輸入框的監聽事件
+        pageSelectionInput.addEventListener('input', function() {
+            if (!currentPdfDoc) return;
+            
+            try {
+                const pages = parsePageSelection(this.value.trim(), currentPdfDoc.numPages);
+                if (!pages) {
+                    // 如果輸入為空，清除所有選擇
+                    document.querySelectorAll('.page-preview-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    selectedPages.clear();
+                    return;
+                }
+
+                // 更新選中狀態
+                document.querySelectorAll('.page-preview-item').forEach(item => {
+                    const page = parseInt(item.dataset.page);
+                    if (pages.includes(page)) {
+                        item.classList.add('selected');
+                        selectedPages.add(page);
+                    } else {
+                        item.classList.remove('selected');
+                        selectedPages.delete(page);
+                    }
+                });
+            } catch (error) {
+                console.error('頁面選擇格式錯誤:', error);
+                // 保持當前選擇狀態不變
+            }
+        });
+
+        // 更新圖片品質顯示
+        imageQualitySlider.addEventListener('input', function() {
+            imageQualityValue.textContent = `${this.value}%`;
+        });
+
+        // 解析頁面選擇字串
+        function parsePageSelection(input, totalPages) {
+            if (!input.trim()) return null;
+            
+            const pages = new Set();
+            const parts = input.split(',').map(part => part.trim());
+            
+            for (const part of parts) {
+                if (part.includes('-')) {
+                    // 處理範圍，如 "1-3"
+                    const [start, end] = part.split('-').map(num => parseInt(num));
+                    if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > totalPages) {
+                        throw new Error('無效的頁面範圍');
+                    }
+                    for (let i = start; i <= end; i++) {
+                        pages.add(i);
+                    }
+                } else {
+                    // 處理單頁，如 "5"
+                    const pageNum = parseInt(part);
+                    if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+                        throw new Error('無效的頁碼');
+                    }
+                    pages.add(pageNum);
+                }
+            }
+            
+            return Array.from(pages).sort((a, b) => a - b);
+        }
+
+        compressButton.addEventListener('click', async function() {
+            if (!selectedFile || isProcessing) return;
+
+            const selectedMode = document.querySelector('input[name="compression-mode"]:checked');
+            if (!selectedMode) {
+                alert('請選擇壓縮模式');
+                return;
+            }
+
+            isProcessing = true;
+            compressButton.disabled = true;
+            downloadButton.disabled = true;
+            showProgress('正在壓縮...');
+            caterpillarContainer.style.display = 'block';
+
+            try {
+                // 清除對話循環
+                if (dialogInterval) {
+                    clearInterval(dialogInterval);
+                    dialogInterval = null;
+                }
+
+                isMoving = true;
+                isProcessing = true;
+                // 重置對話
+                currentDialog = '';
+                const speechBubble = document.getElementById('speech-bubble');
+                speechBubble.style.display = 'none';
+                speechBubble.classList.remove('show');
+
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+
+                // 處理頁面選擇
+                let pagesToProcess = [];
+                if (pageSelectionToggle.checked && pageSelectionInput.value.trim()) {
+                    try {
+                        pagesToProcess = parsePageSelection(pageSelectionInput.value, pdfDoc.numPages);
+                    } catch (error) {
+                        alert(error.message);
+                        return;
+                    }
+                } else {
+                    // 如果沒有選擇特定頁面，處理所有頁面
+                    pagesToProcess = Array.from({length: pdfDoc.numPages}, (_, i) => i + 1);
+                }
+
+                // 根據模式設定壓縮品質
+                let compressionSettings;
+                switch(selectedMode.value) {
+                    case 'high':
+                        compressionSettings = {
+                            imageQuality: 0.6,  // 預設使用 60% 的品質設定
+                            renderScale: 3.0,
+                        };
+                        break;
+                    case 'medium':
+                        compressionSettings = {
+                            imageQuality: 0.5,
+                            renderScale: 1.0,
+                        };
+                        break;
+                    default:
+                        compressionSettings = {
+                            imageQuality: 0.6,
+                            renderScale: 3.0,
+                        };
+                }
+
+                console.log('使用的壓縮模式:', selectedMode.value, '品質:', compressionSettings.imageQuality, '渲染比例:', compressionSettings.renderScale);
+
+                // 創建新的 PDF
+                const { jsPDF } = window.jspdf;
+                let newPdf = null;
+                
+                // 獲取原始 PDF 的第一頁來確定文件尺寸
+                const firstPage = await pdfDoc.getPage(1);
+                const originalViewport = firstPage.getViewport({scale: 1});
+                
+                // 使用原始 PDF 的尺寸來創建新的 PDF
+                newPdf = new jsPDF({
+                    orientation: originalViewport.width > originalViewport.height ? 'landscape' : 'portrait',
+                    unit: 'pt',
+                    format: [originalViewport.width, originalViewport.height],
+                    compress: selectedMode.value !== 'high'  // 高品質模式不壓縮
+                });
+                
+                for (let i = 0; i < pagesToProcess.length; i++) {
+                    const pageNum = pagesToProcess[i];
+                    const progress = Math.round(i / pagesToProcess.length * 100);
+                    progressInfo.textContent = `正在處理第 ${pageNum} 頁，共 ${pagesToProcess.length} 頁... (${progress}%)`;
+                    
+                    // 使用新的移動函數
+                    moveCaterpillar(progress);
+
+                    const page = await pdfDoc.getPage(pageNum);
+                    const viewport = page.getViewport({scale: 1});
+                    
+                    // 創建新的 canvas 和 context
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d', {
+                        alpha: true,  // 啟用 alpha 通道以保持更好的品質
+                        willReadFrequently: true
+                    });
+
+                    if (!context) {
+                        throw new Error('無法創建 Canvas 上下文');
+                    }
+
+                    if (i > 0) {
+                        newPdf.addPage([viewport.width, viewport.height]);
+                    }
+
+                    // 根據頁面大小動態調整渲染比例
+                    const pageArea = viewport.width * viewport.height;
+                    const maxArea = 1000000; // 100萬像素作為基準
+                    const dynamicScale = Math.min(
+                        compressionSettings.renderScale,
+                        Math.max(1.0, Math.sqrt(maxArea / pageArea) * compressionSettings.renderScale)
+                    );
+
+                    canvas.height = viewport.height * dynamicScale;
+                    canvas.width = viewport.width * dynamicScale;
+                    
+                    const scaledViewport = page.getViewport({scale: dynamicScale});
+                    
+                    // 設定更好的渲染品質
+                    context.imageSmoothingEnabled = true;
+                    context.imageSmoothingQuality = 'high';
+
+                    // 根據模式設定不同的渲染參數
+                    await page.render({
+                        canvasContext: context,
+                        viewport: scaledViewport,
+                        background: 'white',
+                        renderInteractiveForms: true,
+                        enableWebGL: true,
+                        ...(selectedMode.value === 'high' ? {
+                            intent: 'display',
+                            renderTextBetter: true,
+                            antialiasing: true,
+                            useSystemFonts: true
+                        } : {})
+                    }).promise;
+
+                    // 圖像處理
+                    const imgData = canvas.toDataURL('image/jpeg', compressionSettings.imageQuality);
+                    
+                    newPdf.addImage(
+                        imgData,
+                        'JPEG',
+                        0, 0, viewport.width, viewport.height,
+                        `page_${i}`,
+                        {
+                            imageQuality: compressionSettings.imageQuality,
+                            compression: 'JPEG',
+                            quality: compressionSettings.imageQuality
+                        }
+                    );
+
+                    // 清理資源
+                    canvas.width = 0;
+                    canvas.height = 0;
+                    canvas.remove();  // 完全移除 canvas 元素
+                }
+                
+                processedFile = await newPdf.output('blob');
+                
+                const compressedSize = (processedFile.size / (1024 * 1024)).toFixed(2);
+                const originalSize = (selectedFile.size / (1024 * 1024)).toFixed(2);
+                fileInfo.innerHTML = `
+                    <p>原始大小: ${originalSize} MB</p>
+                    <p>壓縮後大小: ${compressedSize} MB</p>
+                    <p>壓縮率: ${Math.round((1 - processedFile.size / selectedFile.size) * 100)}%</p>
+                `;
+                
+                downloadButton.disabled = false;
+                showProgress('壓縮完成！');
+                
+                // 在下載 PDF 前顯示煙火動畫
+                showFireworks();
+                
+                // 修改完成後的對話顯示
+                setTimeout(() => {
+                    isMoving = false;
+                    showSpeechBubble(DIALOGS.complete);
+                    
+                    setTimeout(() => {
+                        caterpillar.style.transition = 'left 1s ease';
+                        caterpillar.style.left = window.innerWidth + 'px';
+                        
+                        setTimeout(() => {
+                            resetAndReenterPet();
+                        }, 1000);
+                    }, DIALOG_DURATIONS.complete);
+                }, 100);
+
+                // 壓縮完成後調用 onCompressionComplete 函數
+                onCompressionComplete();
+
+            } catch (error) {
+                console.error('PDF 壓縮失敗:', error);
+                alert('PDF 壓縮失敗：' + (error.message || '請重試'));
+                showProgress('處理失敗');
+                processedFile = null;
+                downloadButton.disabled = true;
+                caterpillarContainer.style.display = 'none';
+                isMoving = false;
+            } finally {
+                isProcessing = false;
+                compressButton.disabled = false;
+            }
+        });
+
+        // 修改下載 JPG 的邏輯
+        document.getElementById('download-jpg-button').addEventListener('click', async function() {
+            if (!selectedFile) return;
+
+            // 在下載 JPG 前顯示煙火動畫
+            showFireworks();
+
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+
+            const pagesToProcess = []; // 儲存要處理的頁面
+
+            // 檢查是否選擇了特定頁面
+            if (pageSelectionToggle.checked && pageSelectionInput.value.trim()) {
+                try {
+                    pagesToProcess.push(...parsePageSelection(pageSelectionInput.value, pdfDoc.numPages));
+                } catch (error) {
+                    alert(error.message);
+                    return;
+                }
+            } else {
+                // 如果沒有選擇特定頁面，處理所有頁面
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    pagesToProcess.push(i);
+                }
+            }
+
+            // 獲取用戶選擇的圖片品質
+            const imageQualitySlider = document.getElementById('image-quality');
+            const imageQuality = imageQualitySlider.value / 100; // 將範圍值轉換為 0 到 1 的範圍
+
+            // 如果只有選擇一張幻燈片，直接下載 JPG
+            if (pagesToProcess.length === 1) {
+                const pageNum = pagesToProcess[0];
+                const page = await pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({scale: 2}); // 設定縮放比例
+
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                const context = canvas.getContext('2d');
+                await page.render({canvasContext: context, viewport: viewport}).promise;
+
+                // 將 canvas 轉換為 JPG，使用用戶選擇的品質
+                const imgData = canvas.toDataURL('image/jpeg', imageQuality); // 使用選擇的品質
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = `${selectedFile.name.split('.')[0]}_page_${pageNum}.jpg`; // 設定下載檔名
+                link.click();
+            } else {
+                // 如果選擇多於一張幻燈片，則打包成 ZIP
+                const zip = new JSZip(); // 創建一個新的 ZIP 實例
+
+                for (let i = 0; i < pagesToProcess.length; i++) {
+                    const pageNum = pagesToProcess[i];
+                    const page = await pdfDoc.getPage(pageNum);
+                    const viewport = page.getViewport({scale: 2}); // 設定縮放比例
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    const context = canvas.getContext('2d');
+                    await page.render({canvasContext: context, viewport: viewport}).promise;
+
+                    // 將 canvas 轉換為 JPG，使用用戶選擇的品質
+                    const imgData = canvas.toDataURL('image/jpeg', imageQuality); // 使用選擇的品質
+
+                    // 將 JPG 圖像數據添加到 ZIP
+                    const imgBlob = await (await fetch(imgData)).blob(); // 將數據轉換為 Blob
+                    zip.file(`${selectedFile.name.split('.')[0]}_page_${pageNum}.jpg`, imgBlob); // 添加到 ZIP
+                }
+
+                // 生成 ZIP 檔案並下載
+                zip.generateAsync({type: 'blob'}).then(function(content) {
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(content);
+                    link.href = url;
+                    link.download = `${selectedFile.name.split('.')[0]}_slides.zip`; // 設定下載檔名
+                    link.click();
+                    URL.revokeObjectURL(url); // 釋放 URL
+                });
+            }
+        });
+
+        // 修改下載 PDF 的邏輯
+        downloadButton.addEventListener('click', async function() {
+            if (processedFile) {
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(processedFile);
+                const originalName = selectedFile.name.split('.')[0];
+                link.href = url;
+                link.download = `${originalName}_compressed.pdf`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        });
+
+        // 自動滾動至下載 PDF 按鈕的函數
+        function onCompressionComplete() {
+            // 自動滾動至下載 PDF 按鈕
+            const downloadButtonPosition = downloadButton.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({
+                top: downloadButtonPosition,
+                behavior: 'smooth' // 平滑滾動
+            });
+        }
+
+        // 拖放功能
+        const dropZone = document.getElementById('drop-zone');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener('dragleave', unhighlight, false);
+        });
+        
+        function highlight(e) {
+            dropZone.classList.add('drag-over');
+        }
+        
+        function unhighlight(e) {
+            dropZone.classList.remove('drag-over');
+        }
+        
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            
+            if (file && file.type === 'application/pdf') {
+                fileInput.files = dt.files;
+                fileInput.dispatchEvent(new Event('change'));
+            } else {
+                alert('請選擇 PDF 檔案');
+                dropZone.classList.remove('has-file');
+                const fileInfoPreview = dropZone.querySelector('.file-info-preview');
+                fileInfoPreview.classList.remove('show');
+            }
+        }
+        
+        // Google Slides 轉換功能
+        const slidesLink = document.getElementById('slides-link');
+        const fetchButton = document.getElementById('fetch-slides');
+        const downloadedFileInfo = document.getElementById('downloaded-file-info');
+        const filePathInfo = document.getElementById('file-path-info');
+        
+        fetchButton.addEventListener('click', async function() {
+            const link = slidesLink.value.trim();
+            if (!link) {
+                alert('請輸入 Google Slides 連結');
+                return;
+            }
+            
+            if (!link.includes('docs.google.com/presentation')) {
+                alert('請輸入有效的 Google Slides 連結');
+                return;
+            }
+            
+            // 將 Google Slides 連結轉換為 PDF 下載連結
+            const pdfLink = link.replace('/edit', '/export/pdf');
+            
+            // 創建一個臨時的 <a> 元素來觸發下載
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pdfLink;
+            downloadLink.target = '_blank';  // 在新標籤頁中打開
+            downloadLink.click();
+            
+            // 顯示提示資訊
+            downloadedFileInfo.style.display = 'block';
+            filePathInfo.textContent = '下載完成後，上傳PDF檔案進行壓縮';
+        });
+
+        // 監聽視窗大小變化
+        window.addEventListener('resize', function() {
+            if (caterpillarContainer.style.display === 'block') {
+                const progress = parseInt(caterpillar.style.left) / (window.innerWidth - 150);
+                const newPosition = progress * (window.innerWidth - 150);
+                caterpillar.style.left = `${newPosition}px`;
+            }
+        });
+
+        // 改進單選框的選中效果
+        document.querySelectorAll('.mode-item').forEach(item => {
+            const radio = item.querySelector('input[type="radio"]');
+            // 初始化選中狀態
+            if (radio.checked) {
+                item.classList.add('selected');
+            }
+            
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.mode-item').forEach(i => {
+                    i.classList.remove('selected');
+                });
+                if (radio.checked) {
+                    item.classList.add('selected');
+                }
+            });
+
+            // 點擊整個卡片時觸發單選框
+            item.addEventListener('click', (e) => {
+                if (e.target !== radio) {
+                    radio.click();
+                }
+            });
+        });
+
+        // 修正進度提示的顯示邏輯
+        function showProgress(message) {
+            const progressInfo = document.getElementById('progress-info');
+            progressInfo.textContent = message;
+            progressInfo.style.display = 'block';
+            // 強制重繪以觸發動畫
+            progressInfo.offsetHeight;
+            progressInfo.classList.add('show');
+        }
+
+        function hideProgress() {
+            const progressInfo = document.getElementById('progress-info');
+            progressInfo.classList.remove('show');
+            setTimeout(() => {
+                progressInfo.style.display = 'none';
+            }, 300);
+        }
+
+        // 修正記憶體洩漏問題
+        window.addEventListener('beforeunload', function() {
+            if (processedFile) {
+                URL.revokeObjectURL(processedFile);
+            }
+            if (dialogInterval) {
+                clearInterval(dialogInterval);
+            }
+        });
+
+        // 修改生成頁面預覽函數
+        async function generatePreviews(pdfDoc) {
+            pagePreviews.innerHTML = '';
+            // 添加載入提示
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'preview-loading';
+            loadingDiv.innerHTML = `
+                <div>正在生成預覽...</div>
+                <div class="preview-progress">
+                    <div class="preview-progress-bar"></div>
+                </div>
+            `;
+            pagePreviews.appendChild(loadingDiv);
+            pagePreviews.classList.add('show');
+
+            const totalPages = pdfDoc.numPages;
+            
+            // 預設全選所有頁面
+            selectedPages = new Set(Array.from({length: totalPages}, (_, i) => i + 1));
+            
+            const previewPromises = [];
+            const previewItems = [];
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'page-preview-item selected';
+                previewItem.dataset.page = i;
+                
+                // 添加頁碼
+                const pageNumber = document.createElement('div');
+                pageNumber.className = 'page-number';
+                pageNumber.textContent = i;
+                previewItem.appendChild(pageNumber);
+                
+                previewItems.push(previewItem);
+
+                // 非阻塞的預覽生成
+                const previewPromise = (async () => {
+                    const page = await pdfDoc.getPage(i);
+                    const viewport = page.getViewport({scale: 0.15}); // 進一步降低縮放比例
+                    
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport,
+                        intent: 'print', // 使用 print intent 以獲得更快的渲染速度
+                        renderInteractiveForms: false,
+                        background: 'white'
+                    }).promise;
+                    
+                    const img = document.createElement('img');
+                    // 使用 JPEG 格式，更低的品質
+                    img.src = canvas.toDataURL('image/jpeg', 0.3);
+                    img.className = 'page-preview-image';
+                    previewItem.insertBefore(img, pageNumber);
+                    
+                    // 立即清理 canvas
+                    canvas.remove();
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.width = canvas.height = 0;
+                    
+                    // 更新進度條
+                    const progressBar = loadingDiv.querySelector('.preview-progress-bar');
+                    const progress = ((i / totalPages) * 100).toFixed(0);
+                    progressBar.style.width = `${progress}%`;
+                    loadingDiv.querySelector('div:first-child').textContent = 
+                        `正在生成預覽... (${progress}%)`;
+                })();
+                
+                previewPromises.push(previewPromise);
+            }
+
+            // 先顯示預覽項目的框架
+            previewItems.forEach(item => pagePreviews.appendChild(item));
+
+            // 等待所有預覽生成完成
+            await Promise.all(previewPromises);
+            
+            // 移除載入提示
+            loadingDiv.remove();
+            
+            updatePageSelectionInput();
+            setupPreviewClickHandlers();
+        }
+
+        // 修改預覽圖點擊處理
+        function setupPreviewClickHandlers() {
+            let isDragging = false;
+            let startPage = null;
+            let isSelecting = true; // 用於追蹤是選取還是取消選取
+
+            document.querySelectorAll('.page-preview-item').forEach(item => {
+                // 滑鼠按下
+                item.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    const page = parseInt(item.dataset.page);
+                    startPage = page;
+
+                    // 決定是選取還是取消選取
+                    isSelecting = !selectedPages.has(page);
+
+                    if (e.shiftKey && lastSelectedPage) {
+                        // Shift 多選
+                        const start = Math.min(lastSelectedPage, page);
+                        const end = Math.max(lastSelectedPage, page);
+                        for (let i = start; i <= end; i++) {
+                            const pageItem = document.querySelector(`.page-preview-item[data-page="${i}"]`);
+                            if (pageItem) {
+                                if (isSelecting) {
+                                    selectedPages.add(i);
+                                    pageItem.classList.add('selected');
+                                } else {
+                                    selectedPages.delete(i);
+                                    pageItem.classList.remove('selected');
+                                }
+                            }
+                        }
+                    } else {
+                        // 一般點擊
+                        if (!isSelecting) {
+                            selectedPages.delete(page);
+                            item.classList.remove('selected');
+                        } else {
+                            selectedPages.add(page);
+                            item.classList.add('selected');
+                        }
+                        lastSelectedPage = page;
+                    }
+                    updatePageSelectionInput();
+                });
+
+                // 滑鼠移動
+                item.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    const page = parseInt(item.dataset.page);
+                    if (page !== startPage) {
+                        const start = Math.min(startPage, page);
+                        const end = Math.max(startPage, page);
+                        document.querySelectorAll('.page-preview-item').forEach(preview => {
+                            const previewPage = parseInt(preview.dataset.page);
+                            if (previewPage >= start && previewPage <= end) {
+                                if (isSelecting) {
+                                    selectedPages.add(previewPage);
+                                    preview.classList.add('selected');
+                                } else {
+                                    selectedPages.delete(previewPage);
+                                    preview.classList.remove('selected');
+                                }
+                            }
+                        });
+                        updatePageSelectionInput();
+                    }
+                });
+            });
+
+            // 滑鼠放開
+            document.addEventListener('mouseup', (e) => {
+                isDragging = false;
+                startPage = null;
+            });
+
+            // 防止拖動時選中文字
+            pagePreviews.addEventListener('selectstart', (e) => {
+                if (isDragging) e.preventDefault();
+            });
+
+            // 防止拖動時觸發瀏覽器的預設行為
+            pagePreviews.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+            });
+        }
+
+        // 更新頁面選擇輸入框
+        function updatePageSelectionInput() {
+            const pages = Array.from(selectedPages).sort((a, b) => a - b);
+            pageSelectionInput.value = pages.join(',');
+        }
+
+        // 修改毛毛蟲點擊事件
+        caterpillar.addEventListener('click', function() {
+            if (!isProcessing && !isShowingCompressComplete) {
+                const randomResponse = DIALOGS.clickResponses[
+                    Math.floor(Math.random() * DIALOGS.clickResponses.length)
+                ];
+                showSpeechBubble(randomResponse);
+            }
+        });
+
+        // 添加毛毛蟲移動函數
+        function moveCaterpillar(progress) {
+            if (!isProcessing) return;
+            
+            const maxLeft = window.innerWidth - 150;
+            const position = (progress / 100) * maxLeft;
+            
+            // 確保毛毛蟲只能向前移動
+            if (position > parseInt(caterpillar.style.left || '0')) {
+                caterpillar.style.left = `${position}px`;
+                lastProgress = progress;
+            }
+        }
+
+        // 修改寵物重置和重新進入函數
+        function resetAndReenterPet() {
+            const caterpillar = document.querySelector('.caterpillar');
+            setTimeout(() => {
+                caterpillar.style.transition = 'none';
+                caterpillar.style.left = '-150px';  // 開始於畫面外
+                caterpillarContainer.style.display = 'block';
+                
+                // 選擇新的寵物
+                currentPet = getRandomPet(predefinedPets);
+                caterpillar.style.backgroundImage = `url('${currentPet}')`;
+                
+                // 強制重繪
+                caterpillar.offsetHeight;
+                
+                // 開始進入動畫
+                setTimeout(() => {
+                    caterpillar.style.transition = 'left 0.5s ease';
+                    caterpillar.style.left = '20px';
+                    // 根據下載狀態顯示不同對話
+                    if (processedFile && !downloadButton.disabled) {
+                        showSpeechBubble("Download啦");
+                    } else {
+                        showSpeechBubble(DIALOGS.initial);
+                    }
+                }, 50);
+            }, 2000);  // 等待2秒後重新進入
+        }
+
+        // 新增煙火動畫的函數
+        function showFireworks() {
+            const fireworksContainer = document.createElement('div');
+            fireworksContainer.id = 'fireworks-container';
+            fireworksContainer.style.position = 'fixed';
+            fireworksContainer.style.top = '0';
+            fireworksContainer.style.left = '0';
+            fireworksContainer.style.width = '100%';
+            fireworksContainer.style.height = '100%';
+            fireworksContainer.style.pointerEvents = 'none'; // 使其不影響其他元素
+            document.body.appendChild(fireworksContainer);
+
+            const fireworks = new Fireworks(fireworksContainer, {
+                speed: 2,
+                acceleration: 1.05,
+                friction: 0.98,
+                gravity: 1,
+                particles: 100,
+                trace: 3,
+                explosion: 5,
+                boundaries: {
+                    top: 50,
+                    bottom: window.innerHeight,
+                    left: 0,
+                    right: window.innerWidth,
+                },
+            });
+
+            fireworks.start();
+
+            // 漸變消失的效果
+            setTimeout(() => {
+                fireworks.stop();
+                // 漸變消失
+                fireworksContainer.style.transition = 'opacity 1s ease-out'; // 設定過渡效果
+                fireworksContainer.style.opacity = '0'; // 設定透明度為 0
+
+                // 在過渡結束後移除容器
+                fireworksContainer.addEventListener('transitionend', () => {
+                    fireworksContainer.remove(); // 移除煙火容器
+                });
+            }, 5000); // 5秒後開始漸變消失
+        }
+    </script>
+</body>
+</html> 
